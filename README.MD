@@ -4,5 +4,5 @@ Repositório com os códigos assembly32 das aulas da disciplina de PIHS
 
 [aula11](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula11) -> Explicação sobre as instruções add, sub, inc, dec, div, mul, idiv, imul
 
-[aula12](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula12) -> Instruções de saltos, condicionais e incodicionais e como fazer um loop. Instruções abordadas: jmp, je, jne, jz, jnz, jle, jl, jg, jge, jcxz, jecxz, jo, jc, loop.
+[aula12](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula12) -> Instruções de saltos, condicionais e incondicionais, como executar um loop. Instruções abordadas: jmp, je, jne, jz, jnz, jle, jl, jg, jge, jcxz, jecxz, jo, jc, loop.
 
