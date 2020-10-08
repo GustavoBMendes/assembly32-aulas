@@ -10,3 +10,5 @@ Repositório com os códigos assembly32 das aulas da disciplina de PIHS
 
 [Aula 14](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula14) -> Código para calcular média de x aulas de uma turma, com o número de alunos e a média de cada um sendo lidos do teclado, utilizando loop para fazer essa leitura + desafio mostrando a maior e a menor média da turma.
 
+[Aula 15](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula15) -> Programa para classificar triângulos como isósceles, equilátero e escaleno. Leitura dos valores dos lados do triângulo e comparação entre eles.
+
