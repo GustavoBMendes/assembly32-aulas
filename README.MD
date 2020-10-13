@@ -1,6 +1,6 @@
 Repositório com os códigos assembly32 das aulas da disciplina de PIHS
 
-[Aula 10](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula10) -> Aula sobre as instruções mov, push, pop, sal, sar, ror, rol, xchg + código desafio da aula + código para calcular área de triângulos.
+[Aula 10](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula10) -> Aula sobre as instruções mov, push, pop, sal, sar, ror, rol, xchg + código desafio da aula (cálculo de potência utilizando rotação de bits) + código para calcular área de triângulos.
 
 [Aula 11](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula11) -> Explicação sobre as instruções add, sub, inc, dec, div, mul, idiv, imul
 
@@ -11,4 +11,6 @@ Repositório com os códigos assembly32 das aulas da disciplina de PIHS
 [Aula 14](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula14) -> Código para calcular média de x aulas de uma turma, com o número de alunos e a média de cada um sendo lidos do teclado, utilizando loop para fazer essa leitura + desafio mostrando a maior e a menor média da turma.
 
 [Aula 15](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula15) -> Programa para classificar triângulos como isósceles, equilátero e escaleno. Leitura dos valores dos lados do triângulo e comparação entre eles.
+
+[Aula 17](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula17) -> Programa para cálculo de figuras geométricas. Criação de procedimentos.
 
