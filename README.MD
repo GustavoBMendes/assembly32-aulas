@@ -14,3 +14,5 @@ Repositório com os códigos assembly32 das aulas da disciplina de PIHS
 
 [Aula 17](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula17) -> Programa para cálculo de figuras geométricas. Criação de procedimentos.
 
+[Aula 18](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula18) -> Manipulação de vetor. Código para inverter vetor e soma dos elementos do vetor.
+
