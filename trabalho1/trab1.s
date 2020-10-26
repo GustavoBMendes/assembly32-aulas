@@ -35,12 +35,14 @@
 
 	tamreg:		.int	55
 	opcao:		.int 	0
+	cont:		.int 	0
 
 	tipoint:	.asciz	"%d"
 	tipocar:	.asciz	"%c"
 	tipostr:	.ASCIZ	"%S"
 
-	lista:		.int	0
+	lista:		.int	NULL
+	prt_lista:	.int	0
 
 	NULL:		.int	0
 
@@ -64,7 +66,8 @@ call_consulta:
 	jmp		main
 
 call_relatorio:
-	call	mostrar_registro
+	movl 	lista, %edi
+	call	relatorio
 	jmp		main
 
 main:
@@ -100,6 +103,60 @@ fim:
 	pushl	$0
 	call	exit
 
+relatorio:
+	pushl 	%edi
+
+	pushl 	$mostranome
+	call 	printf
+	addl 	$4, %esp
+
+	popl	%edi
+	addl	$31, %edi
+	pushl	%edi
+
+	movl	(%edi), %eax
+	pushl	%eax
+	pushl	$mostraidade
+	call	printf
+	addl	$8, %esp
+
+	popl	%edi
+	addl	$4, %edi
+	pushl	%edi
+
+	pushl	$mostracpf
+	call	printf
+	addl	$4, %esp
+
+	popl	%edi
+	addl	$12, %edi
+	pushl	%edi
+
+	movl	(%edi), %eax
+	pushl	%eax
+	pushl	$mostragenero
+	call	printf
+	addl	$8, %esp
+
+	popl	%edi
+	addl	$4, %edi
+	pushl 	%edi
+
+	pushl 	$mostraprox
+	call 	printf
+	addl	$4, %esp
+
+	popl 	%edi
+
+	subl	$51, %edi
+	movl	51(%edi), %edi
+
+	incl	cont
+	cmpl 	$2, cont
+	jne		relatorio
+
+	ret
+
 remover_reg:
 	pushl	$abert_remove
 	call 	printf
@@ -131,6 +188,7 @@ ler_registro:
 	addl	$4, %esp
 
 	movl	lista, %edi
+	#addl	prt_lista, %edi
 	pushl	%edi
 	call 	gets
 	call	gets
@@ -178,13 +236,18 @@ ler_registro:
 	addl	$4, %edi
 
 	movl	$NULL, (%edi)
-	
+
+	#movl 	$51, %ebx
+	#addl	%ebx, prt_lista	
+
+	subl	$51, %edi
+	movl 	prt_lista, %eax
+	movl	%eax, 51(%edi)
+	movl	%edi, prt_lista
 
 	ret
 
 mostrar_registro:
-
-	movl	lista, %edi
 
 	pushl	%edi
 
