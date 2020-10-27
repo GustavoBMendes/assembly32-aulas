@@ -7,6 +7,12 @@
 #	
 #	total de bytes: 55 bytes
 
+#nome completo, 
+#endereço (rua, número, bairro, CEP, cidade, telefone, Email), 
+#data de nascimento, 
+#gênero, 
+#CPF, RG, data de contratação, cargo e salário.
+
 #MODOS:
 #1 -> Inserção
 #2 -> Remoção
@@ -36,6 +42,9 @@
 	tamreg:		.int	55
 	opcao:		.int 	0
 	cont:		.int 	0
+	nregs:		.int	0
+
+	nome_consulta:	.asciz "gustavo" #exemplo
 
 	tipoint:	.asciz	"%d"
 	tipocar:	.asciz	"%c"
@@ -67,7 +76,9 @@ call_consulta:
 
 call_relatorio:
 	movl 	lista, %edi
+	movl	nregs, %ebx
 	call	relatorio
+	movl	$0, cont
 	jmp		main
 
 main:
@@ -138,21 +149,15 @@ relatorio:
 	call	printf
 	addl	$8, %esp
 
-	popl	%edi
-	addl	$4, %edi
-	pushl 	%edi
-
-	pushl 	$mostraprox
-	call 	printf
-	addl	$4, %esp
-
 	popl 	%edi
 
-	subl	$51, %edi
+	subl	$47, %edi
 	movl	51(%edi), %edi
 
+	pushl 	%ebx
 	incl	cont
-	cmpl 	$2, cont
+	cmpl 	cont, %ebx
+	popl	%ebx
 	jne		relatorio
 
 	ret
@@ -168,6 +173,13 @@ remover_reg:
 consulta_reg:
 	pushl 	$abert_consulta
 	call 	printf
+
+	#pushl	$nome_consulta
+	#movl 	lista, %edi
+	#pushl	%edi
+	#call 	strcmp
+	#cmpl	$0, %eax
+	#je		ler_registro
 
 	addl 	$4, %esp
 
@@ -188,7 +200,6 @@ ler_registro:
 	addl	$4, %esp
 
 	movl	lista, %edi
-	#addl	prt_lista, %edi
 	pushl	%edi
 	call 	gets
 	call	gets
@@ -237,13 +248,12 @@ ler_registro:
 
 	movl	$NULL, (%edi)
 
-	#movl 	$51, %ebx
-	#addl	%ebx, prt_lista	
-
 	subl	$51, %edi
 	movl 	prt_lista, %eax
 	movl	%eax, 51(%edi)
 	movl	%edi, prt_lista
+
+	addl	$1, nregs
 
 	ret
 
