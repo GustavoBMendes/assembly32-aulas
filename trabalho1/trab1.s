@@ -21,158 +21,60 @@
 
 .section .data
 
-	msg_inicial: 	.asciz	"\nSELECIONE UMA DAS OPÇÕES ABAIXO:\n"
-	menu:		.asciz	"1-Inserção\n2-Remoção\n3-Consulta\n4-Relatório\n0-Sair"
-	msg_escolha:	.asciz	"\nDigite apenas o número da opção desejada: "
-	abertura:	.asciz	"\nLeitura de Registro\n\n"
-	pedenome:	.asciz	"\nDigite o nome: "
-	pedeidade:	.asciz	"\nDigite sua idade: "
-	pedecpf:	.asciz	"\nDigite o CPF: "
-	pedegenero:	.asciz	"\nDigite o genero <M>asculino/<F>eminino "
+	titgeral: .asciz "\n*** APLICAÇÃO DE LISTA DE REGISTROS DE RH ***"
+	titinser: .asciz "\nINSERÇÃO: "
+	titremov: .asciz "\nREMOÇÃO: "
+	titmostra: .asciz "\nREGISTROS DA LISTA: "
+	titreg: .asciz "\nRegistro no %d: "
 
-	abert_remove:	.asciz	"\nEntre com um nome para remover seu registro."
-	abert_consulta:	.asciz	"\nEntre com um nome para consultar seu registro."
+	menu: .asciz "\n1-Inserção\n2-Remoção\n3-Consulta\n4-Relatório\n0-Sair\n> "
 
-	mostranome:	.asciz	"\nNome: %s"
-	mostraidade:	.asciz	"\nIdade: %d"
-	mostracpf:	.asciz	"\nCPF: %s"
-	mostragenero:	.asciz	"\nGenero: %c"
-	mostraprox:	.asciz	"\nEndereco do Proximo: %X\n\n"
-
-	tamreg:		.int	55
-	opcao:		.int 	0
-	cont:		.int 	0
-	nregs:		.int	0
+	msgerro: .asciz "\nOpcao incorreta!\n"
+	msgvazia: .asciz "\nLista vazia"
+	msgremov: .asciz "\nRegistro removido!"
+	msginser: .asciz "\nRegistro inserido!"
+	
+	pedenome: .asciz "\nDigite o nome: "
+	pedeidade: .asciz "\nDigite a idade: "
+	pedesexo: .asciz "\nQual o sexo, <f>eminino ou <m>asculino? "
+	pedecpf: .asciz "\nDigite o cpf: "
 
 	nome_consulta:	.asciz "gustavo" #exemplo
 
-	tipoint:	.asciz	"%d"
-	tipocar:	.asciz	"%c"
-	tipostr:	.ASCIZ	"%S"
+	mostranome: .asciz "\nNome: %s"
+	mostraidade: .asciz "\nIdade: %d"
+	mostrasexo: .asciz "\nSexo: %c"
+	mostracpf: .asciz "\nCPF: %s"
+	abert_consulta:	.asciz	"\nEntre com um nome para consultar seu registro."
 
-	lista:		.int	NULL
-	prt_lista:	.int	0
+	mostrapt: .asciz "\nptlista = %d"
 
-	NULL:		.int	0
+	formastr: .asciz "%s"
+	formach: .asciz "%c"
+	formanum: .asciz "%d"
+
+	pulalin: .asciz "\n"
+
+	NULL: .int 0
+
+	opcao: .int 0
+
+	regtam: .int 84
+	lista: .int NULL
+	ptreg: .int NULL
 
 .section .text
 
-
 .globl _start
 _start:
-	jmp 	main
 
-call_ler:
-	call	ler_registro
-	jmp 	main
+	jmp main
 
-call_remocao:
-	call 	remover_reg
-	jmp		main
 
-call_consulta:
-	call 	consulta_reg
-	jmp		main
-
-call_relatorio:
-	movl 	lista, %edi
-	movl	nregs, %ebx
-	call	relatorio
-	movl	$0, cont
-	jmp		main
-
-main:
-	pushl 	$msg_inicial
-	call 	printf
-	pushl 	$menu
-	call 	printf
-	pushl 	$msg_escolha
-	call 	printf
-
-	pushl 	$opcao
-	pushl 	$tipoint
-	call 	scanf
-
-	addl	$20, %esp
-
-	movl 	opcao, %eax
-	cmpl 	$1, %eax
-	je		call_ler
-
-	cmpl	$2, %eax
-	je		call_remocao
-
-	cmpl	$3, %eax
-	je		call_consulta
-
-	cmpl	$4, %eax
-	je		call_relatorio
-
-	jmp 	fim
-
-fim:
-	pushl	$0
-	call	exit
-
-relatorio:
-	pushl 	%edi
-
-	pushl 	$mostranome
-	call 	printf
-	addl 	$4, %esp
-
-	popl	%edi
-	addl	$31, %edi
-	pushl	%edi
-
-	movl	(%edi), %eax
-	pushl	%eax
-	pushl	$mostraidade
-	call	printf
-	addl	$8, %esp
-
-	popl	%edi
-	addl	$4, %edi
-	pushl	%edi
-
-	pushl	$mostracpf
-	call	printf
-	addl	$4, %esp
-
-	popl	%edi
-	addl	$12, %edi
-	pushl	%edi
-
-	movl	(%edi), %eax
-	pushl	%eax
-	pushl	$mostragenero
-	call	printf
-	addl	$8, %esp
-
-	popl 	%edi
-
-	subl	$47, %edi
-	movl	51(%edi), %edi
-
-	pushl 	%ebx
-	incl	cont
-	cmpl 	cont, %ebx
-	popl	%ebx
-	jne		relatorio
-
-	ret
-
-remover_reg:
-	pushl	$abert_remove
-	call 	printf
-	
-	addl 	$4, %esp
-
-	ret
-
-consulta_reg:
-	pushl 	$abert_consulta
-	call 	printf
+consulta:
+	pushl $abert_consulta
+	call printf
+	addl $4, %esp
 
 	#pushl	$nome_consulta
 	#movl 	lista, %edi
@@ -181,130 +83,250 @@ consulta_reg:
 	#cmpl	$0, %eax
 	#je		ler_registro
 
-	addl 	$4, %esp
+	jmp main
 
-	ret
+novo_reg:
 
-ler_registro:
+	pushl $titinser
+	call printf
 
-	pushl	$abertura
-	call	printf
+	movl regtam, %ecx
+	pushl %ecx
+	call malloc
+	movl %eax, ptreg
+
+	pushl ptreg
+	pushl $mostrapt
+	call printf
+
+	addl $16, %esp
+	movl ptreg, %edi
+	call le_dados
+
+	movl lista, %eax
+	movl %eax, 80(%edi)
+	movl %edi, lista
+
+	pushl $msginser
+	call printf
+	addl $4, %esp
+
+	jmp menuop
+
+le_dados:
+
+	pushl %edi		#endereço inicial registro
+
+	pushl $pedenome
+	call printf
+	addl $4, %esp
+	call gets
+
+	popl %edi		#recupera %edi
+	addl $44, %edi		#avanca para o proximo campo
+	pushl %edi		#armazena na lista
+
+	pushl $pedeidade
+	call printf
+	addl $4, %esp
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+
+	popl %edi		#recupera %edi
+	addl $8, %edi		#avanca para o proximo campo
+	pushl %edi		#armazena na lista
 	
-	pushl	tamreg
-	call	malloc
-	movl	%eax, lista
-	addl	$8, %esp
+	pushl $formach		#para remover o enter
+	call scanf
+	addl $4, %esp
 
-	pushl	$pedenome
-	call	printf
-	addl	$4, %esp
+	pushl $pedesexo
+	call printf
+	addl $4, %esp
+	pushl $formach
+	call scanf
+	addl $4, %esp
 
-	movl	lista, %edi
-	pushl	%edi
-	call 	gets
-	call	gets
+	popl %edi		#recupera %edi
+	addl $4, %edi		#avanca para o proximo campo
+	pushl %edi		#armazena na pilha
 
-	popl	%edi
-	addl	$31, %edi
-
-	pushl	%edi
-
-	pushl	$pedeidade
-	call	printf
-	addl	$4, %esp
-
-	pushl	$tipoint
-	call	scanf
-	addl	$4, %esp
-
-	popl	%edi
-	addl	$4, %edi
-
-	pushl	%edi
-
-	pushl	$pedecpf
-	call	printf
-	addl	$4, %esp
-
-	call	gets
-	call	gets
-
-	popl	%edi
-	addl	$12, %edi
-
-	pushl	%edi
-
-	pushl	$pedegenero
-	call	printf
-	addl	$4, %esp
-
-	pushl	$tipocar
-	call	scanf
-	addl	$4, %esp
+	pushl $formach		#para remover o enter
+	call scanf
+	addl $4, %esp
 	
-	popl	%edi
+	pushl $pedecpf
+	call printf
+	addl $4, %esp
+	call gets
 
-	addl	$4, %edi
-
-	movl	$NULL, (%edi)
-
-	subl	$51, %edi
-	movl 	prt_lista, %eax
-	movl	%eax, 51(%edi)
-	movl	%edi, prt_lista
-
-	addl	$1, nregs
-
-	ret
-
-mostrar_registro:
-
-	pushl	%edi
-
-	pushl	$mostranome
-	call	printf
-	addl	$4, %esp
+	popl %edi		#recupera %edi
+	addl $24, %edi		#avanca para o proximo campo
+	movl $NULL, (%edi)
 	
-	popl	%edi
-	addl	$31, %edi
-	pushl	%edi
+	subl $80, %edi		#retorna o edi para o estado inicial
 
-	movl	(%edi), %eax
-	pushl	%eax
-	pushl	$mostraidade
-	call	printf
-	addl	$8, %esp
+	RET
 
-	popl	%edi
-	addl	$4, %edi
-	pushl	%edi
+remover_reg:
+	
+	pushl $titremov
+	call printf
+	addl $4, %esp
 
-	pushl	$mostracpf
-	call	printf
-	addl	$4, %esp
+	movl lista, %edi
+	cmpl $NULL, %edi
+	jnz continua
 
-	popl	%edi
-	addl	$12, %edi
-	pushl	%edi
+	pushl $msgvazia
+	call printf
+	addl $4, %esp
 
-	movl	(%edi), %eax
-	pushl	%eax
-	pushl	$mostragenero
-	call	printf
-	addl	$8, %esp
+	jmp menuop
 
-	popl	%edi
-	addl	$4, %edi
-	pushl	%edi
+continua:
 
-	pushl	$mostraprox
-	call	printf
-	addl	$4, %esp
+	movl lista, %edi
+	pushl %edi
+	movl 80(%edi), %edi
+	movl %edi, lista
 
-	popl	%edi
+	pushl $msgremov
+	call printf
+	addl $4, %esp
 
+	call free
+	addl $4, %esp
 
-	ret
+	jmp menuop
 
+mostra_dados: 
 
+	pushl %edi		#endereco inicial do registro, contendo todos os campos
+	
+	pushl $mostranome
+	call printf
+	addl $4, %esp
 
+	popl %edi		#recupera %edi
+	addl $44, %edi		#avanca para o proximo campo
+	pushl %edi		#armazena na lista
+
+	pushl (%edi)
+	pushl $mostraidade
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	addl $8, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostrasexo
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	pushl $mostracpf
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	subl $56, %edi
+
+	RET
+
+relatorio:
+
+	pushl $titmostra
+	call printf
+
+	movl lista, %edi 
+	cmpl $NULL, %edi
+	jnz continua2
+
+	pushl $msgvazia
+	call printf
+	addl $4, %esp
+
+	jmp menuop
+
+continua2:
+
+	movl lista, %edi
+	movl $1, %ecx
+
+volta:
+
+	cmpl $NULL, %edi
+	jz menuop
+
+	pushl %edi
+
+	pushl %ecx
+	pushl $titreg
+	call printf
+	addl $4, %esp
+
+	movl 4(%esp), %edi		#recupera %edi sem desempilhar
+	call mostra_dados
+
+	popl %ecx
+	incl %ecx
+	popl %edi
+	movl 80(%edi), %edi
+
+	jmp volta
+
+	jmp menuop
+
+menuop:
+
+	pushl $menu
+	call printf
+	
+	pushl $opcao	
+	pushl $formanum
+	call scanf
+
+	addl $12, %esp
+	
+	pushl $formach			#para remover o enter
+	call scanf
+	addl $4, %esp
+
+	cmpl $1, opcao
+	jz novo_reg
+
+	cmpl $2, opcao
+	jz remover_reg
+
+	cmpl $3, opcao
+	jz consulta
+
+	cmpl $4, opcao
+	jz relatorio
+
+	cmpl $0, opcao
+	jz fim
+
+	pushl $msgerro
+	call printf
+	addl $4, %esp
+
+	jmp menuop
+
+main:
+	
+	pushl $titgeral
+	call printf
+	jmp menuop
+
+fim:
+
+	pushl $0 
+	call exit
