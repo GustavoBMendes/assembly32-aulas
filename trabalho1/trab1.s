@@ -25,7 +25,7 @@
 	titinser: .asciz "\nINSERÇÃO: "
 	titremov: .asciz "\nREMOÇÃO: "
 	titmostra: .asciz "\nREGISTROS DA LISTA: "
-	titreg: .asciz "\nRegistro no %d: "
+	titreg: .asciz "\nRegistro numero %d: "
 
 	menu: .asciz "\n1-Inserção\n2-Remoção\n3-Consulta\n4-Relatório\n0-Sair\n> "
 
@@ -76,14 +76,113 @@ consulta:
 	call printf
 	addl $4, %esp
 
-	#pushl	$nome_consulta
-	#movl 	lista, %edi
-	#pushl	%edi
-	#call 	strcmp
-	#cmpl	$0, %eax
-	#je		ler_registro
+	jmp procura
 
-	jmp main
+mostra_reg:
+	pushl $mostranome
+	call printf
+	add $4, %esp
+
+	popl %edi		#recupera %edi
+	addl $44, %edi		#avanca para o proximo campo
+	pushl %edi		#armazena na lista
+
+	pushl (%edi)
+	pushl $mostraidade
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	addl $8, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostrasexo
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	pushl $mostracpf
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	subl $56, %edi
+
+	RET
+
+percorre_dados: 
+
+	pushl %edi		#endereco inicial do registro, contendo todos os campos
+	pushl $nome_consulta
+	call strcmp
+	addl $4, %esp
+	cmpl $0, %eax
+	jz mostra_reg
+
+	popl %edi		#recupera %edi
+	addl $44, %edi		#avanca para o proximo campo
+	pushl %edi		#armazena na lista
+
+	popl %edi
+	addl $8, %edi
+	pushl %edi
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	popl %edi
+	subl $56, %edi
+
+	RET
+
+procura:
+
+	pushl $titmostra
+	call printf
+
+	movl lista, %edi 
+	cmpl $NULL, %edi
+	jnz continua3
+
+	pushl $msgvazia
+	call printf
+	addl $4, %esp
+
+	jmp menuop
+
+continua3:
+
+	movl lista, %edi
+	movl $1, %ecx
+
+volta2:
+
+	cmpl $NULL, %edi
+	jz menuop
+
+	pushl %edi
+
+	pushl %ecx
+	pushl $titreg
+	call printf
+	addl $4, %esp
+
+	movl 4(%esp), %edi		#recupera %edi sem desempilhar
+	call percorre_dados
+
+	popl %ecx
+	incl %ecx
+	popl %edi
+	movl 80(%edi), %edi
+
+	jmp volta2
+
+	jmp menuop
 
 novo_reg:
 
