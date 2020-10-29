@@ -166,11 +166,7 @@ volta2:
 	jz menuop
 
 	pushl %edi
-
 	pushl %ecx
-	pushl $titreg
-	call printf
-	addl $4, %esp
 
 	movl 4(%esp), %edi		#recupera %edi sem desempilhar
 	call percorre_dados
@@ -202,9 +198,9 @@ novo_reg:
 	movl ptreg, %edi
 	call le_dados
 
-	movl lista, %eax
-	movl %eax, 80(%edi)
-	movl %edi, lista
+	movl lista, %eax	
+	movl %eax, 80(%edi)	#move a lista para o final do novo reg
+	movl %edi, lista	#move uma copia de edi para lista
 
 	pushl $msginser
 	call printf
