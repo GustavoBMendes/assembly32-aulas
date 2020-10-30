@@ -62,6 +62,7 @@
 	regtam: .int 84
 	lista: .int NULL
 	ptreg: .int NULL
+	ptrfim: .int NULL
 
 .section .text
 
@@ -179,7 +180,14 @@ volta2:
 	jmp volta2
 
 	jmp menuop
-
+procura_pos:
+	movl ptrfim, %eax
+	movl %edi, 80(%eax)
+	movl %edi, ptrfim
+	pushl $msginser
+	call printf
+	add $4, %esp
+	jmp menuop
 novo_reg:
 
 	pushl $titinser
@@ -198,9 +206,12 @@ novo_reg:
 	movl ptreg, %edi
 	call le_dados
 
-	movl lista, %eax	
+	movl lista, %eax
+	cmpl $NULL, %eax
+	jne procura_pos	
 	movl %eax, 80(%edi)	#move a lista para o final do novo reg
 	movl %edi, lista	#move uma copia de edi para lista
+	movl %edi, ptrfim
 
 	pushl $msginser
 	call printf
@@ -378,6 +389,11 @@ volta:
 	jmp volta
 
 	jmp menuop
+
+
+
+
+
 
 menuop:
 
