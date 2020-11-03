@@ -62,6 +62,8 @@
 	regtam: .int 84
 	lista: .int NULL
 	ptreg: .int NULL
+	ptratual: .int NULL
+	ptrant: .int NULL
 	ptrfim: .int NULL
 
 .section .text
@@ -181,13 +183,72 @@ volta2:
 
 	jmp menuop
 procura_pos:
+
+	movl %eax, ptrant
+	movl 80(%eax), %ebx
+	movl %ebx, ptratual
+
+	pushl lista
+	pushl %edi
+	call strcasecmp
+	addl $8, %esp
+	cmpl $0, %eax
+	jle inserirnoinicio
+	
+	pushl ptrfim
+	pushl %edi
+	call strcasecmp
+	addl $8, %esp
+	cmpl $0, %eax
+	jge inserirnofim
+
+avanca:
+	movl ptratual, %eax
+	cmpl %eax, ptrfim
+	je inserenomeio
+
+	movl %eax, ptratual
+	pushl ptratual
+	pushl %edi
+	call strcasecmp
+	addl $8, %esp
+	cmpl $0, %eax
+	jle inserenomeio
+
+	movl ptratual, %eax
+	movl %eax, ptrant
+	movl 80(%eax), %ebx
+	movl %ebx, ptratual
+	jmp avanca
+
+inserenomeio:
+	movl ptratual, %eax
+	movl ptrant, %esi
+	movl %edi, 80(%esi)
+	movl %eax, 80(%edi)
+	pushl $msginser
+	call printf
+	addl $4, %esp
+	jmp menuop
+
+inserirnoinicio:
+	movl lista, %esi
+	movl %esi, 80(%edi)
+	movl %edi, lista
+	pushl $msginser
+	call printf
+	addl $4, %esp
+	jmp menuop
+
+inserirnofim:
 	movl ptrfim, %eax
 	movl %edi, 80(%eax)
 	movl %edi, ptrfim
 	pushl $msginser
 	call printf
-	add $4, %esp
+	addl $4, %esp
 	jmp menuop
+
 novo_reg:
 
 	pushl $titinser
@@ -198,11 +259,7 @@ novo_reg:
 	call malloc
 	movl %eax, ptreg
 
-	pushl ptreg
-	pushl $mostrapt
-	call printf
-
-	addl $16, %esp
+	addl $8, %esp
 	movl ptreg, %edi
 	call le_dados
 
