@@ -39,13 +39,13 @@
 	pedesexo: .asciz "\nQual o sexo, <f>eminino ou <m>asculino? "
 	pedecpf: .asciz "\nDigite o cpf: "
 
-	nome_consulta:	.asciz "gustavo" #exemplo
+	nome_consulta:	.space 44
 
 	mostranome: .asciz "\nNome: %s"
 	mostraidade: .asciz "\nIdade: %d"
 	mostrasexo: .asciz "\nSexo: %c"
 	mostracpf: .asciz "\nCPF: %s"
-	abert_consulta:	.asciz	"\nEntre com um nome para consultar seu registro."
+	abert_consulta:	.asciz	"\nEntre com um nome para consultar seu registro: "
 
 	mostrapt: .asciz "\nptlista = %d"
 
@@ -73,11 +73,13 @@ _start:
 
 	jmp main
 
-
+#CONSULTA NOME#
 consulta:
 	pushl $abert_consulta
 	call printf
-	addl $4, %esp
+	pushl $nome_consulta
+	call gets
+	addl $8, %esp
 
 	jmp procura
 
