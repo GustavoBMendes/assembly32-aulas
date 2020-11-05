@@ -35,17 +35,29 @@
 	msginser: .asciz "\nRegistro inserido!"
 	
 	pedenome: .asciz "\nDigite o nome: "
-	pedeidade: .asciz "\nDigite a idade: "
+	pededatanasc: .asciz "\nDigite a data de nascimento: "
 	pedesexo: .asciz "\nQual o sexo, <f>eminino ou <m>asculino? "
 	pedecpf: .asciz "\nDigite o cpf: "
+	pederg: .asciz "\nDigite o rg: "
+	pededatacont: .asciz "\nDigite a data da contratação: "
+	pedecargo: .asciz "\nDigite o nome do cargo: "
+	pedesalario: .asciz "\nEntre com o valor do salario: "
+	pederua: .asciz "\nEntre com o nome da rua: "
+	pedenum: .asciz "\nInforme o número do endereço: "
+	pedebairro: .asciz "\nDigite o nome do bairro: "
+	pedecidade: .asciz "\nCidade: "
+	pedetel: .asciz "\nInforme o número de telefone: "
+	pedemail: .asciz "\nDigite o endereço de email: "
 
 	nome_consulta:	.space 44
+	nome_remove: 	.space 44
 
 	mostranome: .asciz "\nNome: %s"
 	mostraidade: .asciz "\nIdade: %d"
 	mostrasexo: .asciz "\nSexo: %c"
 	mostracpf: .asciz "\nCPF: %s"
 	abert_consulta:	.asciz	"\nEntre com um nome para consultar seu registro: "
+	abert_remove:	.asciz	"\nEntre com um nome para remover seu registro: "
 
 	mostrapt: .asciz "\nptlista = %d"
 
@@ -70,7 +82,6 @@
 
 .globl _start
 _start:
-
 	jmp main
 
 #CONSULTA NOME#
@@ -117,10 +128,9 @@ mostra_reg:
 	popl %edi
 	subl $56, %edi
 
-	RET
+	jmp fimconsulta
 
-percorre_dados: 
-
+percorre_dados:
 	pushl %edi		#endereco inicial do registro, contendo todos os campos
 	pushl $nome_consulta
 	call strcmp
@@ -158,7 +168,7 @@ procura:
 	call printf
 	addl $4, %esp
 
-	jmp menuop
+	ret
 
 continua3:
 
@@ -166,7 +176,6 @@ continua3:
 	movl $1, %ecx
 
 volta2:
-
 	cmpl $NULL, %edi
 	jz menuop
 
@@ -183,7 +192,12 @@ volta2:
 
 	jmp volta2
 
-	jmp menuop
+	ret
+
+fimconsulta:
+	ret
+	
+#INSERIR REG#
 procura_pos:
 
 	movl %eax, ptrant
@@ -279,7 +293,6 @@ novo_reg:
 	jmp menuop
 
 le_dados:
-
 	pushl %edi		#endereço inicial registro
 
 	pushl $pedenome
@@ -334,11 +347,17 @@ le_dados:
 
 	RET
 
+#REMOVER REG#
 remover_reg:
-	
 	pushl $titremov
 	call printf
 	addl $4, %esp
+
+	pushl $abert_remove
+	call printf
+	pushl $nome_remove
+	call gets
+	addl $8, %esp
 
 	movl lista, %edi
 	cmpl $NULL, %edi
@@ -350,8 +369,7 @@ remover_reg:
 
 	jmp menuop
 
-continua:
-
+removeprimeiro:
 	movl lista, %edi
 	pushl %edi
 	movl 80(%edi), %edi
@@ -366,6 +384,102 @@ continua:
 
 	jmp menuop
 
+remove:
+	movl ptrant, %esi
+	movl 80(%edi), %eax
+	movl %eax, 80(%esi)
+	pushl %edi
+	call free
+
+	pushl $msgremov
+	call printf
+	addl $8, %esp
+	jmp menuop
+
+procurareg:
+	pushl %edi
+	pushl $nome_remove
+	call strcmp
+	addl $4, %esp
+	cmpl $0, %eax
+	jz remove
+	movl %edi, ptrant
+
+	popl %edi
+	addl $44, %edi
+	pushl %edi
+
+	popl %edi 
+	addl $8, %edi
+	pushl %edi
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	popl %edi
+	subl $56, %edi
+
+	ret
+
+continua:
+	movl lista, %edi
+	movl $1, %ecx
+
+procurainicio:
+	cmpl $NULL, %edi
+	jz menuop
+	pushl %edi
+	pushl %ecx
+	movl 4(%esp), %edi
+
+	pushl %edi
+	pushl $nome_remove
+	call strcmp
+	addl $4, %esp
+	cmpl $0, %eax
+	jz removeprimeiro
+	movl %edi, ptrant
+
+	popl %edi
+	addl $44, %edi
+	pushl %edi
+
+	popl %edi 
+	addl $8, %edi
+	pushl %edi
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	popl %edi
+	subl $56, %edi
+
+	popl %ecx
+	incl %ecx
+	popl %edi
+	movl 80(%edi), %edi
+
+voltaremove:
+	cmpl $NULL, %edi
+	jz menuop
+	
+	pushl %edi
+	pushl %ecx
+
+	movl 4(%esp), %edi
+	call procurareg
+
+	popl %ecx
+	incl %ecx
+	popl %edi
+	movl 80(%edi), %edi
+
+	jmp voltaremove
+	ret
+
+#RELATORIO#
 mostra_dados: 
 
 	pushl %edi		#endereco inicial do registro, contendo todos os campos
@@ -449,11 +563,7 @@ volta:
 
 	jmp menuop
 
-
-
-
-
-
+#MENU#
 menuop:
 
 	pushl $menu
@@ -497,6 +607,5 @@ main:
 	jmp menuop
 
 fim:
-
 	pushl $0 
 	call exit
