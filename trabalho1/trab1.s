@@ -25,7 +25,7 @@
 	titinser: .asciz "\nINSERÇÃO: "
 	titremov: .asciz "\nREMOÇÃO: "
 	titmostra: .asciz "\nREGISTROS DA LISTA: "
-	titreg: .asciz "\nRegistro numero %d: "
+	titreg: .asciz "\n\nRegistro numero %d: "
 
 	menu: .asciz "\n1-Inserção\n2-Remoção\n3-Consulta\n4-Relatório\n0-Sair\n> "
 
@@ -35,6 +35,7 @@
 	msginser: .asciz "\nRegistro inserido!"
 	
 	pedenome: .asciz "\nDigite o nome: "
+	pedeidade: .asciz "\nDigite a idade: "
 	pededatanasc: .asciz "\nDigite a data de nascimento: "
 	pedesexo: .asciz "\nQual o sexo, <f>eminino ou <m>asculino? "
 	pedecpf: .asciz "\nDigite o cpf: "
@@ -48,14 +49,26 @@
 	pedecidade: .asciz "\nCidade: "
 	pedetel: .asciz "\nInforme o número de telefone: "
 	pedemail: .asciz "\nDigite o endereço de email: "
+	pedecep: .asciz "\nDigite o cep do seu endereço: "
 
 	nome_consulta:	.space 44
 	nome_remove: 	.space 44
 
 	mostranome: .asciz "\nNome: %s"
-	mostraidade: .asciz "\nIdade: %d"
+	mostradatanasc: .asciz "\nData de nascimento: %s"
 	mostrasexo: .asciz "\nSexo: %c"
 	mostracpf: .asciz "\nCPF: %s"
+	mostrarg: .asciz "\nRG: %s"
+	mostrarua: .asciz "\nNome da rua: %s"
+	mostranum: .asciz "\nNumero do endereço: %d"
+	mostrabairro: .asciz "\nBairo: %s"
+	mostracep: .asciz "\nCEP: %s"
+	mostracidade: .asciz "\nCidade: %s"
+	mostratel: .asciz "\nTelefone: %s"
+	mostraemail: .asciz "\nEmail: %s"
+	mostradatacont: .asciz "\nData de contratação: %s"
+	mostracargo: .asciz "\nCargo: %s"
+	mostrasalario: .asciz "\nSalario: %d\n"
 	abert_consulta:	.asciz	"\nEntre com um nome para consultar seu registro: "
 	abert_remove:	.asciz	"\nEntre com um nome para remover seu registro: "
 
@@ -71,7 +84,7 @@
 
 	opcao: .int 0
 
-	regtam: .int 84
+	regtam: .int 254
 	lista: .int NULL
 	ptreg: .int NULL
 	ptratual: .int NULL
@@ -97,19 +110,19 @@ consulta:
 mostra_reg:
 	pushl $mostranome
 	call printf
-	add $4, %esp
+	addl $4, %esp
 
 	popl %edi		#recupera %edi
 	addl $44, %edi		#avanca para o proximo campo
-	pushl %edi		#armazena na lista
+	pushl %edi		#salva na pilha de exec
 
-	pushl (%edi)
-	pushl $mostraidade
+	pushl %edi
+	pushl $mostradatanasc
 	call printf
 	addl $8, %esp
 
 	popl %edi
-	addl $8, %edi
+	addl $12, %edi
 	pushl %edi
 
 	pushl (%edi)
@@ -126,7 +139,97 @@ mostra_reg:
 	addl $4, %esp
 
 	popl %edi
-	subl $56, %edi
+	addl $24, %edi
+	pushl %edi
+
+	pushl $mostrarg
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $12, %edi
+	pushl %edi
+
+	pushl $mostrarua
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostranum
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	pushl $mostrabairro
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl $mostracep
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $10, %edi
+	pushl %edi
+
+	pushl $mostracidade
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $15, %edi
+	pushl %edi
+
+	pushl $mostratel
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $15, %edi
+	pushl %edi
+
+	pushl $mostraemail
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $35, %edi
+	pushl %edi
+
+	pushl $mostradatacont
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $11, %edi
+	pushl %edi
+
+	pushl $mostracargo
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostrasalario
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	subl $246, %edi		#volta ao estado inicial do edi
 
 	jmp fimconsulta
 
@@ -135,34 +238,21 @@ percorre_dados:
 	pushl $nome_consulta
 	call strcmp
 	addl $4, %esp
-	cmpl $0, %eax
-	jz mostra_reg
-
-	popl %edi		#recupera %edi
-	addl $44, %edi		#avanca para o proximo campo
-	pushl %edi		#armazena na lista
+	cmpl $0, %eax	#resultado de strcmp armazenado em eax, se igual retorna 0
+	jz mostra_reg	#igual, entao mostra registro
 
 	popl %edi
-	addl $8, %edi
-	pushl %edi
-
-	popl %edi
-	addl $4, %edi
-	pushl %edi
-
-	popl %edi
-	subl $56, %edi
+	subl $246, %edi	#retorna edi ao estado original
 
 	RET
 
 procura:
-
 	pushl $titmostra
 	call printf
 
 	movl lista, %edi 
 	cmpl $NULL, %edi
-	jnz continua3
+	jnz continua3	#lista nao esta vazia, entao procura o registro
 
 	pushl $msgvazia
 	call printf
@@ -171,7 +261,6 @@ procura:
 	ret
 
 continua3:
-
 	movl lista, %edi
 	movl $1, %ecx
 
@@ -188,7 +277,7 @@ volta2:
 	popl %ecx
 	incl %ecx
 	popl %edi
-	movl 80(%edi), %edi
+	movl 250(%edi), %edi	#avança para o proximo registro
 
 	jmp volta2
 
@@ -201,47 +290,47 @@ fimconsulta:
 procura_pos:
 
 	movl %eax, ptrant
-	movl 80(%eax), %ebx
-	movl %ebx, ptratual
+	movl 250(%eax), %ebx
+	movl %ebx, ptratual		#utiliza o ponteiro anterior como atual
 
-	pushl lista
+	pushl lista		#ponteiro pro primeiro registro da lista
 	pushl %edi
-	call strcasecmp
+	call strcasecmp	#compara o registro a ser inserido com o primeiro da lista
 	addl $8, %esp
 	cmpl $0, %eax
 	jle inserirnoinicio
 	
-	pushl ptrfim
+	pushl ptrfim	#ponteiro pro ultimo registro da lista
 	pushl %edi
-	call strcasecmp
+	call strcasecmp	#compara registro a ser inserido com o ultimo da lista
 	addl $8, %esp
 	cmpl $0, %eax
 	jge inserirnofim
 
 avanca:
 	movl ptratual, %eax
-	cmpl %eax, ptrfim
+	cmpl %eax, ptrfim	#compara se o ponteiro atual está no ultimo registro
 	je inserenomeio
 
 	movl %eax, ptratual
 	pushl ptratual
 	pushl %edi
-	call strcasecmp
+	call strcasecmp		#compara se o ponteiro atual é menor ou igual ao registro novo
 	addl $8, %esp
 	cmpl $0, %eax
 	jle inserenomeio
 
 	movl ptratual, %eax
 	movl %eax, ptrant
-	movl 80(%eax), %ebx
-	movl %ebx, ptratual
+	movl 250(%eax), %ebx 	#avanca pro final do registro, pegando o prox registro do edi
+	movl %ebx, ptratual	
 	jmp avanca
 
 inserenomeio:
 	movl ptratual, %eax
 	movl ptrant, %esi
-	movl %edi, 80(%esi)
-	movl %eax, 80(%edi)
+	movl %edi, 250(%esi)	#move o reg novo para o final do registro anterior
+	movl %eax, 250(%edi)	#move o ponteiro atual para o fim do reg novo
 	pushl $msginser
 	call printf
 	addl $4, %esp
@@ -249,8 +338,8 @@ inserenomeio:
 
 inserirnoinicio:
 	movl lista, %esi
-	movl %esi, 80(%edi)
-	movl %edi, lista
+	movl %esi, 250(%edi) 	#move a lista inteira para o fim do reg novo
+	movl %edi, lista	#copia da lista atualizada para a variavel lista
 	pushl $msginser
 	call printf
 	addl $4, %esp
@@ -258,7 +347,7 @@ inserirnoinicio:
 
 inserirnofim:
 	movl ptrfim, %eax
-	movl %edi, 80(%eax)
+	movl %edi, 250(%eax)	#move o reg novo para o fim do ultimo reg da lista
 	movl %edi, ptrfim
 	pushl $msginser
 	call printf
@@ -276,15 +365,17 @@ novo_reg:
 	movl %eax, ptreg
 
 	addl $8, %esp
-	movl ptreg, %edi
+	movl ptreg, %edi	#aloca o tamanho do registro em edi
 	call le_dados
 
 	movl lista, %eax
 	cmpl $NULL, %eax
-	jne procura_pos	
-	movl %eax, 80(%edi)	#move a lista para o final do novo reg
+	jne procura_pos
+
+	#lista vazia, insere primeiro reg
+	movl %eax, 258(%edi)	#move ponteiro para o final do novo reg
 	movl %edi, lista	#move uma copia de edi para lista
-	movl %edi, ptrfim
+	movl %edi, ptrfim	#move edi para ponteiro de fim da lista
 
 	pushl $msginser
 	call printf
@@ -304,20 +395,14 @@ le_dados:
 	addl $44, %edi		#avanca para o proximo campo
 	pushl %edi		#armazena na lista
 
-	pushl $pedeidade
+	pushl $pededatanasc
 	call printf
 	addl $4, %esp
-	pushl $formanum
-	call scanf
-	addl $4, %esp
+	call gets
 
 	popl %edi		#recupera %edi
-	addl $8, %edi		#avanca para o proximo campo
+	addl $12, %edi		#avanca para o proximo campo
 	pushl %edi		#armazena na lista
-	
-	pushl $formach		#para remover o enter
-	call scanf
-	addl $4, %esp
 
 	pushl $pedesexo
 	call printf
@@ -341,9 +426,117 @@ le_dados:
 
 	popl %edi		#recupera %edi
 	addl $24, %edi		#avanca para o proximo campo
+	pushl %edi
+
+	pushl $pederg
+	call printf
+	addl $4, %esp
+	call gets
+
+	popl %edi
+	addl $12, %edi
+	pushl %edi
+
+	pushl $pederua
+	call printf
+	addl $4, %esp
+	call gets
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl $pedenum
+	call printf
+	addl $4, %esp
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	pushl $formach	#para remover o enter
+	call scanf
+	addl $4, %esp
+
+	pushl $pedebairro
+	call printf
+	addl $4, %esp
+	call gets
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl $pedecep
+	call printf
+	addl $4, %esp
+	call gets
+
+	popl %edi 
+	addl $10, %edi
+	pushl %edi
+
+	pushl $pedecidade
+	call printf
+	addl $4, %esp
+	call gets
+	
+	popl %edi
+	addl $15, %edi
+	pushl %edi
+
+	pushl $pedetel
+	call printf
+	addl $4, %esp
+	call gets
+	
+	popl %edi
+	addl $15, %edi
+	pushl %edi
+
+	pushl $pedemail
+	call printf
+	addl $4, %esp
+	call gets
+	
+	popl %edi
+	addl $35, %edi
+	pushl %edi
+
+	pushl $pededatacont
+	call printf
+	addl $4, %esp
+	call gets
+
+	popl %edi
+	addl $11, %edi
+	pushl %edi
+
+	pushl $pedecargo
+	call printf
+	addl $4, %esp
+	call gets
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl $pedesalario
+	call printf
+	addl $4, %esp
+	pushl $formanum
+	call scanf 
+	addl $4, %esp
+
+	popl %edi
+	addl $4, %edi
+
 	movl $NULL, (%edi)
 	
-	subl $80, %edi		#retorna o edi para o estado inicial
+	subl $250, %edi		#retorna o edi para o estado inicial
 
 	RET
 
@@ -360,7 +553,7 @@ remover_reg:
 	addl $8, %esp
 
 	movl lista, %edi
-	cmpl $NULL, %edi
+	cmpl $NULL, %edi	#verifica se a lista esta vazia
 	jnz continua
 
 	pushl $msgvazia
@@ -372,24 +565,24 @@ remover_reg:
 removeprimeiro:
 	movl lista, %edi
 	pushl %edi
-	movl 80(%edi), %edi
+	movl 250(%edi), %edi	#remove movendo final do primeiro registro para o inicio da lista
 	movl %edi, lista
 
 	pushl $msgremov
 	call printf
 	addl $4, %esp
 
-	call free
+	call free		#desalocar memória
 	addl $4, %esp
 
 	jmp menuop
 
 remove:
 	movl ptrant, %esi
-	movl 80(%edi), %eax
-	movl %eax, 80(%esi)
+	movl 250(%edi), %eax
+	movl %eax, 250(%esi)	#remove passando o final do registro a ser removido para o final do registro anterior
 	pushl %edi
-	call free
+	call free		#desalocar memória
 
 	pushl $msgremov
 	call printf
@@ -404,21 +597,9 @@ procurareg:
 	cmpl $0, %eax
 	jz remove
 	movl %edi, ptrant
-
 	popl %edi
-	addl $44, %edi
 	pushl %edi
-
-	popl %edi 
-	addl $8, %edi
-	pushl %edi
-
 	popl %edi
-	addl $4, %edi
-	pushl %edi
-
-	popl %edi
-	subl $56, %edi
 
 	ret
 
@@ -426,6 +607,7 @@ continua:
 	movl lista, %edi
 	movl $1, %ecx
 
+#primeiro procura se o registro é o primeiro da lista, tratar caso a parte
 procurainicio:
 	cmpl $NULL, %edi
 	jz menuop
@@ -442,24 +624,10 @@ procurainicio:
 	movl %edi, ptrant
 
 	popl %edi
-	addl $44, %edi
-	pushl %edi
-
-	popl %edi 
-	addl $8, %edi
-	pushl %edi
-
-	popl %edi
-	addl $4, %edi
-	pushl %edi
-
-	popl %edi
-	subl $56, %edi
-
 	popl %ecx
 	incl %ecx
 	popl %edi
-	movl 80(%edi), %edi
+	movl 250(%edi), %edi
 
 voltaremove:
 	cmpl $NULL, %edi
@@ -474,7 +642,7 @@ voltaremove:
 	popl %ecx
 	incl %ecx
 	popl %edi
-	movl 80(%edi), %edi
+	movl 250(%edi), %edi
 
 	jmp voltaremove
 	ret
@@ -492,13 +660,13 @@ mostra_dados:
 	addl $44, %edi		#avanca para o proximo campo
 	pushl %edi		#armazena na lista
 
-	pushl (%edi)
-	pushl $mostraidade
+	pushl %edi
+	pushl $mostradatanasc
 	call printf
 	addl $8, %esp
 
 	popl %edi
-	addl $8, %edi
+	addl $12, %edi
 	pushl %edi
 
 	pushl (%edi)
@@ -515,7 +683,97 @@ mostra_dados:
 	addl $4, %esp
 
 	popl %edi
-	subl $56, %edi
+	addl $24, %edi
+	pushl %edi
+
+	pushl $mostrarg
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $12, %edi
+	pushl %edi
+
+	pushl $mostrarua
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostranum
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	pushl $mostrabairro
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl $mostracep
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $10, %edi
+	pushl %edi
+
+	pushl $mostracidade
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $15, %edi
+	pushl %edi
+
+	pushl $mostratel
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $15, %edi
+	pushl %edi
+
+	pushl $mostraemail
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $35, %edi
+	pushl %edi
+
+	pushl $mostradatacont
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $11, %edi
+	pushl %edi
+
+	pushl $mostracargo
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostrasalario
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	subl $246, %edi
 
 	RET
 
@@ -525,7 +783,7 @@ relatorio:
 	call printf
 
 	movl lista, %edi 
-	cmpl $NULL, %edi
+	cmpl $NULL, %edi	#compara se a lista eh vazia
 	jnz continua2
 
 	pushl $msgvazia
@@ -535,12 +793,10 @@ relatorio:
 	jmp menuop
 
 continua2:
-
 	movl lista, %edi
 	movl $1, %ecx
 
 volta:
-
 	cmpl $NULL, %edi
 	jz menuop
 
@@ -557,7 +813,7 @@ volta:
 	popl %ecx
 	incl %ecx
 	popl %edi
-	movl 80(%edi), %edi
+	movl 250(%edi), %edi	#avança para o proximo reg
 
 	jmp volta
 
@@ -601,7 +857,6 @@ menuop:
 	jmp menuop
 
 main:
-	
 	pushl $titgeral
 	call printf
 	jmp menuop
