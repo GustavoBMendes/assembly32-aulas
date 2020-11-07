@@ -1,17 +1,22 @@
 # exemplo de registro
-#	nome: string de ateh 30 caracteres + caractere de final de string = 31 bytes
-#	idade: tipo inteiro de 4 bytes
-#	CPF:	11 caracteres + 1 final de string = 12 bytes ou 4 bytes para 1 inteiro
+#	nome: string de ateh 43 caracteres + caractere de final de string = 44 bytes
+#	data nascimento: 11 + 1 = 12 bytes
+#	CPF:	23 caracteres + 1 final de string = 24 bytes
 #	Genero: masculino ou feminimo -> M ou F -> 1 byte -> 4 bytes
+# 	RG: 12 bytes
+#	Rua: 20 bytes
+#	num endereco: inteiro = 4 bytes
+#	bairro: 20 bytes
+#	cep: 9 bytes + caracter fim = 10 bytes
+#	cidade: 15 bytes
+#	telefone: 15 bytes
+#	email: 35 bytes
+#	data de contratacao: 10 caracteres + 1 final = 11 bytes
+#	cargo: 20 bytes
+#	salario: inteiro = 4 bytes
 #	prox: 4 bytes para conter o endereco do proximo registro
 #	
-#	total de bytes: 55 bytes
-
-#nome completo, 
-#endereço (rua, número, bairro, CEP, cidade, telefone, Email), 
-#data de nascimento, 
-#gênero, 
-#CPF, RG, data de contratação, cargo e salário.
+#	total de bytes: 254 bytes
 
 #MODOS:
 #1 -> Inserção
@@ -28,6 +33,8 @@
 	titreg: .asciz "\n\nRegistro numero %d: "
 
 	menu: .asciz "\n1-Inserção\n2-Remoção\n3-Consulta\n4-Relatório\n0-Sair\n> "
+
+	abertura: .asciz "\nTrabalho prático 1 - Aluno: Gustavo Belançon Mendes ra 99037\n"
 
 	msgerro: .asciz "\nOpcao incorreta!\n"
 	msgvazia: .asciz "\nLista vazia"
@@ -95,6 +102,10 @@
 
 .globl _start
 _start:
+	pushl $abertura
+	call printf
+	add $4, %esp
+	 
 	jmp main
 
 #CONSULTA NOME#
