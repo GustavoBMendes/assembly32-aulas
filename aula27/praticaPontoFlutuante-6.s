@@ -1,4 +1,3 @@
-
 .section .data
 	pedido1: .asciz "\nEntrada de Dados:\n\nDigite A (single float) => "
 	pedido2: .asciz "Digite B (double float) => "
@@ -10,8 +9,8 @@
 	mostramul: .asciz "B * A = %.4lf\n"
 	mostratudo: .asciz "\nTudo Junto:\n\nmultiplicacao = %.2lf divisao = %.2lf subtracao = %.2lf soma = %.2lf\n\n"
 	pulalin: .asciz "\n"
-	formato1: .asciz "%f" # para simples precisão
-	formato2: .asciz "%lf" # para dupla precisão
+	formato1: .asciz "%f" # para simples precisï¿½o
+	formato2: .asciz "%lf" # para dupla precisï¿½o
 	float1: .space 4 # aqui tbem pode ser .single 0
 	float2: .space 8 # aqui tbem pode ser .double 0
 
@@ -19,7 +18,7 @@
 .globl _start
 _start:
 
-1) lê um número ponto flutuante single (4 bytes) e o mostra como um número double (8 bytes)
+#1) lï¿½ um nï¿½mero ponto flutuante single (4 bytes) e o mostra como um nï¿½mero double (8 bytes)
 
 	pushl $pedido1
 	call printf
@@ -38,11 +37,11 @@ _start:
 	call printf
 	addl $4, %esp
 
-Observacao 1: no trecho de código anterior, foi lido um float de 4 bytes, mas o mesmo foi mostrado como um float de 8 bytes. Isso foi feito porque printf sempre considera 8 bytes para floats, seja formatado com %f ou %lf 
+#Observacao 1: no trecho de cï¿½digo anterior, foi lido um float de 4 bytes, mas o mesmo foi mostrado como um float de 8 bytes. Isso foi feito porque printf sempre considera 8 bytes para floats, seja formatado com %f ou %lf 
 
-Observacao 2: note que para mostrar o número lido com scanf usamos a sequencia de instrucoes fldx+subl+fstx
+#Observacao 2: note que para mostrar o nï¿½mero lido com scanf usamos a sequencia de instrucoes fldx+subl+fstx
 
-2) lê um número ponto flutuante single (4 bytes) e tenta mostra-lo como um número single mesmo
+#2) lï¿½ um nï¿½mero ponto flutuante single (4 bytes) e tenta mostra-lo como um nï¿½mero single mesmo
 
 	pushl $pedido1
 	call printf
@@ -58,12 +57,12 @@ Observacao 2: note que para mostrar o número lido com scanf usamos a sequencia d
 				# Pilha do Sistema, convertendo 80 bits em 4
 				# bytes
 	pushl $mostra1 		# como printf sempre considera 8 bytes, aqui
-	call printf 		# ocorrerá um erro na impressão
+	call printf 		# ocorrerï¿½ um erro na impressï¿½o
 	addl $4, %esp
 
-Observacao: note que aqui tambem mostramos o número lido com scanf usando a sequencia de instrucoes fldx+subl+fstx
+#Observacao: note que aqui tambem mostramos o nï¿½mero lido com scanf usando a sequencia de instrucoes fldx+subl+fstx
 
-3) Le e Soma 2 numeros em ponto flutuante: um single e outro double
+#3) Le e Soma 2 numeros em ponto flutuante: um single e outro double
 
 	pushl $pedido1
 	call printf
@@ -90,7 +89,7 @@ Observacao: note que aqui tambem mostramos o número lido com scanf usando a sequ
 	call printf
 	addl $4, %esp
 
-4) Subtrai o numero single do float. Observe que float1 ainda esta no topo
+#4) Subtrai o numero single do float. Observe que float1 ainda esta no topo
 
 	fldl float2 		# recarrega float2 no topo da Pilha PFU
 	fsub %st(1), %st(0) 	# faz %st(0) - %st(1) e sobrescreve
@@ -102,7 +101,7 @@ Observacao: note que aqui tambem mostramos o número lido com scanf usando a sequ
 	call printf
 	addl $4, %esp
 
-5) Divide o numero double pelo single. Observe que float1 ainda esta no topo
+#5) Divide o numero double pelo single. Observe que float1 ainda esta no topo
 
 	fldl float2 		# recoloca float2 no topo da pilha PFU
 	fdiv %st(1), %st(0) 	# faz %st(0) / %st(1) e sobrescreve
@@ -118,3 +117,24 @@ Observacao: note que aqui tambem mostramos o número lido com scanf usando a sequ
 	pushl $0
 	call exit
 
+#6) multiplica o numero double pelo single. Observe que float1 ainda esta no topo
+
+	fldl float2			#recoloca float2 no topo da pilha PFU 
+	fmul %st(1), %st(0)		#faz %st(0) * %st(1) e sobrescreve em %st(0)
+
+	subl $8, %esp
+	fstpl (%esp)			#remove (pop) da pilha PFU para a pilha do sistema
+
+	pushl $mostramul
+	call printf
+	addl $4, %esp
+
+#7) mostra tudo
+
+	pushl $mostratudo
+	call printf
+	addl $4, %esp
+
+	addl $32, %esp			#remove os quatro numero double empilhados
+	pushl $0 
+	call exit
