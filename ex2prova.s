@@ -11,13 +11,19 @@
 	pulaLin: .asciz "\n"
 	pedeConsulta: .asciz "Digite um elemento para ser consultado: "
 	mostraConsulta: .asciz "\nElemento %d encontrado na posicao %d\n"
+	pedereexecucao: .asciz "\nDeseja executar novamente? \n<1>Sim\n<2>Não\n> "
 	naoencontrado: .asciz "\nO elemento desejado nao foi encontrado!\n"
+	maiorelemento: .asciz "\nMaior elemento: %d\n"
+	menorelemento: .asciz "\nMenor elemento: %d\n"
 
 	tam: .int 0
 	num: .int 0
 	soma: .int 0
 	alocacao: .int 0
 	elemento: .int 0
+	opc: .int 0
+	menor: .int 999
+	maior: .int 0
 
 	vetor: .int 0
 
@@ -34,6 +40,16 @@ _start:
 	movl $mostraVetInvertido, %eax
 	call mostraVetor
 	call consultaVetor
+	call mostramaiormenor
+
+	pushl $pedereexecucao
+	call printf
+	pushl $opc
+	pushl $tipoNum
+	call scanf
+
+	cmpl $1, opc
+	je _start
 	
 fim:
 	pushl $0
@@ -167,3 +183,48 @@ igual:
 	popl %ecx
 
 	ret
+
+mostramaiormenor:
+	movl tam, %ecx
+	movl $vetor, %edi
+
+volta3:
+	pushl %ecx
+	pushl %edi
+	
+	movl (%edi), %eax
+	cmpl maior, %eax
+	movl (%edi), %eax
+	jg trocamaior
+cont1:
+	cmpl menor, %eax
+	movl (%edi), %eax
+	jl trocamenor
+cont2:
+	popl %edi
+	popl %ecx
+
+	addl $4, %edi
+	loop volta3
+
+	pushl $pulaLin
+	call printf
+	addl $4, %esp
+
+	pushl maior
+	pushl $maiorelemento
+	call printf
+	pushl menor
+	pushl $menorelemento
+	call printf
+	addl $16, %esp
+
+	ret
+
+trocamaior:
+	movl %eax, maior
+	jmp cont1
+
+trocamenor:
+	movl %eax, menor
+	jmp cont2
