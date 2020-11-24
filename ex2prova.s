@@ -1,5 +1,6 @@
+#ALUNO: GUSTAVO BELANÇON MENDES - RA 99037
 .section .data
-	titulo: .asciz "\nProva 1 de PIHS 2020\n"
+	titulo: .asciz "\nProva 1 - exercício 2 de PIHS 2020\n"
 	pedeTam: .asciz "\nDigite o tamanho do vetor => "
 	pedeNum: .asciz "Entre com o elemento %d => "
 	tipoNum: .asciz "%d"
