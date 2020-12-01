@@ -1,0 +1,3 @@
+Lendo arquivo texto
+denovo
+denovo2
