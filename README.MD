@@ -16,3 +16,13 @@ Repositório com os códigos assembly32 das aulas da disciplina de PIHS
 
 [Aula 18](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula18) -> Manipulação de vetor. Código para inverter vetor e soma dos elementos do vetor.
 
+[Aula 25](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula25) -> Manipulação de pilha com alocação dinâmica via instrução malloc.
+
+[Aula 26](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula26) -> Ordenação de vetor com o método bubble sort.
+
+[Aula 27](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula27) -> Manipulação de dados em ponto flutuante.
+
+[Aula 28](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula28) -> Cálculo de áreas de figuras geométricas em ponto flutuante + desafio encontrar raízes de uma equação de 2º grau.
+
+[Trabalho 1](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/trabalho1) -> Lista de controle de rh. Adição de registros de funcionários, remoção, consulta e relatório de todos os registros.
+
