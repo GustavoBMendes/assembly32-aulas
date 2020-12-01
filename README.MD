@@ -24,5 +24,7 @@ Repositório com os códigos assembly32 das aulas da disciplina de PIHS
 
 [Aula 28](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula28) -> Cálculo de áreas de figuras geométricas em ponto flutuante + desafio encontrar raízes de uma equação de 2º grau.
 
+[Aula 31](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/aula31) -> Intruções de chamadas ao sistema para leitura de strings e gravação/leitura de arquivos.
+
 [Trabalho 1](https://github.com/GustavoBMendes/assembly32-aulas/tree/master/trabalho1) -> Lista de controle de rh. Adição de registros de funcionários, remoção, consulta e relatório de todos os registros.
 
