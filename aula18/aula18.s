@@ -14,8 +14,9 @@
 	tam: .int 0
 	num: .int 0
 	soma: .int 0
+	alocacao: .int 0
 
-	vetor: .space 120 #4 bytes para cada numero a ser armazenado
+	vetor: .space 0 #4 bytes para cada numero a ser armazenado
 
 .section .text
 
@@ -50,8 +51,11 @@ _start:
 		movl	tam, %eax
 		cmpl	$0, %eax
 		jle	leTam
-		cmpl	maxTam, %eax
-		jg 	leTam
+		movl $4, %eax
+		movl tam, %ebx
+		movl %ebx, alocacao
+		mull alocacao
+		movl %eax, vetor
 
 		ret
 	
