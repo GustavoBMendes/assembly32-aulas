@@ -23,6 +23,7 @@
 #2 -> Remoção
 #3 -> Consulta
 #4 -> Relatório (printar todos regs)
+#5 -> Reajuste salarial
 
 .section .data
 
@@ -90,7 +91,7 @@
 	formafloat: .asciz "%f"
 	float1: .space 4
 	float2: .space 4
-	float3: .space 8
+	float3: .float 0.0
 
 	pulalin: .asciz "\n"
 
@@ -126,134 +127,70 @@ reajuste:
 	call scanf
 	addl $16, %esp
 
-	flds float1
-	subl $8, %esp
-	fstps (%esp)
-	pushl $mostra_reaj
-	call printf
+	flds float3
 
-	addl $12, %esp
+	addl $8, %esp
 
 	jmp inicia_reaj
 
 altera_dados: 
 
 	pushl %edi		#endereco inicial do registro, contendo todos os campos
-	
-	pushl $mostranome
-	call printf
-	addl $4, %esp
 
 	popl %edi		#recupera %edi
 	addl $44, %edi		#avanca para o proximo campo
 	pushl %edi		#armazena na lista
 
-	pushl %edi
-	pushl $mostradatanasc
-	call printf
-	addl $8, %esp
-
 	popl %edi
 	addl $12, %edi
 	pushl %edi
 
-	pushl (%edi)
-	pushl $mostrasexo
-	call printf
-	addl $8, %esp
-
 	popl %edi
 	addl $4, %edi
 	pushl %edi
-
-	pushl $mostracpf
-	call printf
-	addl $4, %esp
 
 	popl %edi
 	addl $24, %edi
 	pushl %edi
 
-	pushl $mostrarg
-	call printf
-	addl $4, %esp
-
 	popl %edi
 	addl $12, %edi
 	pushl %edi
 
-	pushl $mostrarua
-	call printf
-	addl $4, %esp
-
 	popl %edi
 	addl $20, %edi
 	pushl %edi
-
-	pushl (%edi)
-	pushl $mostranum
-	call printf
-	addl $8, %esp
 
 	popl %edi
 	addl $4, %edi
 	pushl %edi
 
-	pushl $mostrabairro
-	call printf
-	addl $4, %esp
-
 	popl %edi
 	addl $20, %edi
 	pushl %edi
-
-	pushl $mostracep
-	call printf
-	addl $4, %esp
 
 	popl %edi
 	addl $10, %edi
 	pushl %edi
 
-	pushl $mostracidade
-	call printf
-	addl $4, %esp
-
 	popl %edi
 	addl $15, %edi
 	pushl %edi
 
-	pushl $mostratel
-	call printf
-	addl $4, %esp
-
 	popl %edi
 	addl $15, %edi
 	pushl %edi
-
-	pushl $mostraemail
-	call printf
-	addl $4, %esp
 
 	popl %edi
 	addl $35, %edi
 	pushl %edi
 
-	pushl $mostradatacont
-	call printf
-	addl $4, %esp
-
 	popl %edi
 	addl $11, %edi
 	pushl %edi
 
-	pushl $mostracargo
-	call printf
-	addl $4, %esp
-
 	popl %edi
 	addl $20, %edi
-	pushl %edi
 
 	movl (%edi), %eax
 	movl %eax, float2
@@ -262,20 +199,22 @@ altera_dados:
 
 	fstps (%edi)
 
-	pushl (%edi)
-	pushl $mostrasalario
-	call printf
+	subl $246, %edi
+
+	addl $246, %edi
+
+	flds (%edi)
+	fsubs float2
+	fadd %st(0), %st(1) #st1 <- st1 + st0
+	subl $8, %esp
+	fstpl (%esp)
 	addl $8, %esp
 
-	popl %edi
 	subl $246, %edi
 
 	RET
 
 inicia_reaj:
-
-	pushl $titmostra
-	call printf
 
 	movl lista, %edi 
 	cmpl $NULL, %edi	#compara se a lista eh vazia
@@ -293,14 +232,10 @@ continua_reaj:
 
 percorre_regs:
 	cmpl $NULL, %edi
-	jz menuop
+	jz fimreajuste
 
 	pushl %edi
-
 	pushl %ecx
-	pushl $titreg
-	call printf
-	addl $4, %esp
 
 	movl 4(%esp), %edi		#recupera %edi sem desempilhar
 	call altera_dados
@@ -314,6 +249,14 @@ percorre_regs:
 
 	jmp menuop
 
+fimreajuste:
+	subl $8, %esp
+	fstpl (%esp)
+	pushl $mostrasalario
+	call printf
+	addl $12, %esp
+
+	jmp menuop
 
 #CONSULTA NOME#
 consulta:
