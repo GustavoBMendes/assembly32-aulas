@@ -25,6 +25,13 @@
 #4 -> Relatório (printar todos regs)
 #5 -> Reajuste salarial
 
+#3) Acrescente no menu de opções mais duas opções: "Carregar de Arquivo" e "Gravar em Arquivo" 
+# para carregar a lista com dados já gravados de uma execução anterior ou gravar o vetor atual 
+# no arquivo para que possa ser carregado na próxima execução, respectivamente. 
+# O carregamento a partir do arquivo deve reiniciar a lista para o conteúdo gravado no arquivo. 
+# A gravação em arquivo deve atualizar o conteúdo do arquivo com a nova lista. 
+# As operações de leitura e gravação devem ser implementadas por funções específicas que utilizam chamadas ao sistema e não chamadas de bibliotecas de funções.
+
 .section .data
 
 	titgeral: .asciz "\n*** APLICAÇÃO DE LISTA DE REGISTROS DE RH ***"
@@ -33,8 +40,10 @@
 	titmostra: .asciz "\nREGISTROS DA LISTA: "
 	titreg: .asciz "\n\nRegistro numero %d: "
 	titreaj: .asciz "\nReajuste salarial dos funcionarios:"
+	txtAberturaGravar: 	.asciz "\nGravacao de Registros no arquivo\n"
+	txtPedeNomeArq: .asciz "\nEntre com o nome do arquivo de entrada/saida\n> "
 
-	menu: .asciz "\n1-Inserção\n2-Remoção\n3-Consulta\n4-Relatório\n5-Reajuste Salarial\n0-Sair\n> "
+	menu: .asciz "\n1-Inserção\n2-Remoção\n3-Consulta\n4-Relatório\n5-Reajuste Salarial\n6-Gravar registros no arquivo\n7-Ler registros do arquivo\n0-Sair\n> "
 
 	abertura: .asciz "\nTrabalho prático 1 - Aluno: Gustavo Belançon Mendes ra 99037\n"
 
@@ -62,6 +71,7 @@
 
 	nome_consulta:	.space 44
 	nome_remove: 	.space 44
+	nomeArq: 	.space 50
 
 	mostranome: .asciz "\nNome: %s"
 	mostradatanasc: .asciz "\nData de nascimento: %s"
@@ -80,8 +90,8 @@
 	mostrasalario: .asciz "\nSalario: %f\n"
 	abert_consulta:	.asciz	"\nEntre com um nome para consultar seu registro: "
 	abert_remove:	.asciz	"\nEntre com um nome para remover seu registro: "
-	abert_reaj: .asciz "\nEntre com a porcentagem do reajuste: "
-	mostra_reaj: .asciz "\nPorcentagem do reajuste: %f\n"
+	abert_reaj: .asciz "\nEntre com a porcentagem do reajuste (Exemplo: Entre com 1.50 para 50 porcento de reajuste): "
+	mostra_reaj: .asciz "\nDespesas adicionais após o reajuste: %f\n"
 
 	mostrapt: .asciz "\nptlista = %d"
 
@@ -104,6 +114,59 @@
 	ptratual: .int NULL
 	ptrant: .int NULL
 	ptrfim: .int NULL
+	descritor: 	.int 0 # descritor do arquivo de entrada/saida
+	listaTam: .int 0
+	registro: .int 258
+
+	# As constantes abaixo se referem aos servi�os disponibilizados pelas
+# chamadas ao sistema, devendo serem passadas no registrador %eax
+
+	SYS_EXIT: 	.int 1
+	SYS_FORK: 	.int 2
+	SYS_READ: 	.int 3
+	SYS_WRITE: 	.int 4
+	SYS_OPEN: 	.int 5
+	SYS_CLOSE: 	.int 6
+	SYS_CREAT: 	.int 8
+
+# Descritores de arquivo para sa�da e entrada padr�o
+
+	STD_OUT: 	.int 1 # descritor do video
+	STD_IN:  	.int 2 # descritor do teclado
+
+# Constante usada na chamada exit() para t�rmino normal
+
+	SAIDA_NORMAL: 	.int 0 # codigo de saida bem sucedida
+
+# Constantes de configura��o do parametro flag da chamada open(). Estes valores
+# s�o dependentes de implementa��o. Para se ter certeza dos valores corretos, compile o
+# programa no final deste arquivo usando "gcc valoresopen.c -o valoresopen" e execute-o
+# usando "./valoresopen". Caso seja diferente, corrija as definicoes abaixo.
+
+	O_RDONLY: .int 0x0000 # somente leitura
+	O_WRONLY: .int 0x0001 # somente escrita
+	O_RDWR:   .int 0x0002 # leitura e escrita
+	O_CREAT:  .int 0x0040 # cria o arquivo na abertura, caso ele n�o exista
+	O_EXCL:   .int 0x0080 # for�a a cria��o
+	O_APPEND: .int 0x0400 # posiciona o cursor do arquivo no final, para adi��o
+	O_TRUNC:  .int 0x0200 # reseta o arquivo aberto, deixando com tamanho 0 (zero)
+
+# Constantes de configura��o do parametro mode da chamada open().
+
+	S_IRWXU: .int 0x01C0# user (file owner) has read, write and execute permission
+	S_IRUSR: .int 0x0100 # user has read permission
+	S_IWUSR: .int 0x0080 # user has write permission
+	S_IXUSR: .int 0x0040 # user has execute permission
+	S_IRWXG: .int 0x0038 # group has read, write and execute permission
+	S_IRGRP: .int 0x0020 # group has read permission
+	S_IWGRP: .int 0x0010 # group has write permission
+	S_IXGRP: .int 0x0008 # group has execute permission
+	S_IRWXO: .int 0x0007 # others have read, write and execute permission
+	S_IROTH: .int 0x0004 # others have read permission
+	S_IWOTH: .int 0x0002 # others have write permission
+	S_IXOTH: .int 0x0001 # others have execute permission
+	S_NADA:  .int 0x0000 # n�o altera a situa��o
+
 
 .section .text
 
@@ -115,6 +178,200 @@ _start:
 	finit
 	 
 	jmp main
+
+#MOSTRAR ARQUIVO
+mostraArq:
+	pushl 	$txtPedeNomeArq
+	call 	printf
+	pushl 	$nomeArq
+	call 	gets
+	addl 	$8, %esp
+	call 	abreArqE
+	call 	mostraRegs
+	jmp 	menuop
+
+abreArqE:
+	movl 	SYS_OPEN, %eax 	# system call OPEN: retorna o descritor em %eax
+	movl 	$nomeArq, %ebx
+	movl 	O_RDONLY, %ecx
+	int 	$0x80
+	movl 	%eax, descritor # guarda o descritor
+	ret
+
+mostraRegs:
+	movl 	SYS_READ, %eax # %eax retorna numero de bytes lidos
+	movl 	descritor, %ebx # recupera o descritor
+	movl 	$registro, %ecx
+	movl 	regtam, %edx
+	int 	$0x80 # le registro do arquivo
+	movl 	$registro, %edi
+	cmpl 	$0, %eax
+	je 	fimMostra
+
+	pushl %edi		#endereco inicial do registro, contendo todos os campos
+	
+	pushl $mostranome
+	call printf
+	addl $4, %esp
+
+	popl %edi		#recupera %edi
+	addl $44, %edi		#avanca para o proximo campo
+	pushl %edi		#armazena na lista
+
+	pushl %edi
+	pushl $mostradatanasc
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	addl $12, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostrasexo
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	pushl $mostracpf
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $24, %edi
+	pushl %edi
+
+	pushl $mostrarg
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $12, %edi
+	pushl %edi
+
+	pushl $mostrarua
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostranum
+	call printf
+	addl $8, %esp
+
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	pushl $mostrabairro
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl $mostracep
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $10, %edi
+	pushl %edi
+
+	pushl $mostracidade
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $15, %edi
+	pushl %edi
+
+	pushl $mostratel
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $15, %edi
+	pushl %edi
+
+	pushl $mostraemail
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $35, %edi
+	pushl %edi
+
+	pushl $mostradatacont
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $11, %edi
+	pushl %edi
+
+	pushl $mostracargo
+	call printf
+	addl $4, %esp
+
+	popl %edi
+	addl $20, %edi
+	pushl %edi
+
+	pushl (%edi)
+	flds (%edi)
+	subl $8, %esp
+	fstl (%esp)
+	pushl $mostrasalario
+	call printf
+	addl $16, %esp
+
+	popl %edi
+	subl $246, %edi
+
+fimMostra:
+	RET
+
+#GRAVAR REGISTROS NO ARQUIVO
+abreArqS:
+	movl 	SYS_OPEN, %eax 	# system call OPEN: retorna o descritor em %eax
+	movl 	$nomeArq, %ebx
+	movl 	O_WRONLY, %ecx
+	orl 	O_CREAT, %ecx
+	orl 	O_APPEND, %ecx
+	movl 	S_IRUSR, %edx
+	orl 	S_IWUSR, %edx
+	int 	$0x80
+	movl 	%eax, descritor # guarda o descritor
+	ret
+
+gravaReg:
+	movl 	SYS_WRITE, %eax
+	movl 	descritor, %ebx # recupera o descritor
+	movl 	$lista, %ecx
+	movl 	regtam, %edx
+	int 	$0x80
+	ret
+
+gravar:
+	pushl 	$txtAberturaGravar
+	call 	printf
+	pushl 	$txtPedeNomeArq
+	call 	printf
+	pushl 	$nomeArq
+	call 	gets
+	addl 	$12, %esp
+	call 	abreArqS
+	call 	gravaReg
+
+	jmp menuop
 
 #REAJUSTE SALARIAL#
 reajuste:
@@ -252,7 +509,7 @@ percorre_regs:
 fimreajuste:
 	subl $8, %esp
 	fstpl (%esp)
-	pushl $mostrasalario
+	pushl $mostra_reaj
 	call printf
 	addl $12, %esp
 
@@ -522,6 +779,8 @@ novo_reg:
 
 	pushl $titinser
 	call printf
+	movl regtam, %eax
+	addl %eax, listaTam
 
 	movl regtam, %ecx
 	pushl %ecx
@@ -1016,6 +1275,12 @@ menuop:
 
 	cmpl $5, opcao
 	jz reajuste
+
+	cmpl $6, opcao
+	jz gravar
+
+	cmpl $7, opcao
+	jz mostraArq
 
 	cmpl $0, opcao
 	jz fim
