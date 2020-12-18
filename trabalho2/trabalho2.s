@@ -24,13 +24,8 @@
 #3 -> Consulta
 #4 -> Relatório (printar todos regs)
 #5 -> Reajuste salarial
-
-#3) Acrescente no menu de opções mais duas opções: "Carregar de Arquivo" e "Gravar em Arquivo" 
-# para carregar a lista com dados já gravados de uma execução anterior ou gravar o vetor atual 
-# no arquivo para que possa ser carregado na próxima execução, respectivamente. 
-# O carregamento a partir do arquivo deve reiniciar a lista para o conteúdo gravado no arquivo. 
-# A gravação em arquivo deve atualizar o conteúdo do arquivo com a nova lista. 
-# As operações de leitura e gravação devem ser implementadas por funções específicas que utilizam chamadas ao sistema e não chamadas de bibliotecas de funções.
+#6 -> Gravação da lista em arquivo
+#7 -> Carregamento da lista a partir de arquivo
 
 .section .data
 
@@ -116,7 +111,7 @@
 	ptrfim: .int NULL
 	descritor: 	.int 0 # descritor do arquivo de entrada/saida
 	listaTam: .int 0
-	registro: .int 258
+	registro: .space 258
 
 	# As constantes abaixo se referem aos servi�os disponibilizados pelas
 # chamadas ao sistema, devendo serem passadas no registrador %eax
@@ -201,10 +196,10 @@ abreArqE:
 mostraRegs:
 	movl 	SYS_READ, %eax # %eax retorna numero de bytes lidos
 	movl 	descritor, %ebx # recupera o descritor
-	movl 	$registro, %ecx
+	movl 	$lista, %ecx
 	movl 	regtam, %edx
 	int 	$0x80 # le registro do arquivo
-	movl 	$registro, %edi
+	movl 	$lista, %edi
 	cmpl 	$0, %eax
 	je 	fimMostra
 
@@ -355,7 +350,7 @@ abreArqS:
 gravaReg:
 	movl 	SYS_WRITE, %eax
 	movl 	descritor, %ebx # recupera o descritor
-	movl 	$lista, %ecx
+	movl 	$registro, %ecx
 	movl 	regtam, %edx
 	int 	$0x80
 	ret
@@ -369,7 +364,13 @@ gravar:
 	call 	gets
 	addl 	$12, %esp
 	call 	abreArqS
+	movl 	lista, %edi
+	movl 	%edi, registro
 	call 	gravaReg
+
+	movl 	SYS_CLOSE, %eax #fecha arquivo
+	movl 	descritor, %ebx # recupera o descritor
+	int 	$0x80
 
 	jmp menuop
 
@@ -513,6 +514,7 @@ fimreajuste:
 	call printf
 	addl $12, %esp
 
+	finit
 	jmp menuop
 
 #CONSULTA NOME#
@@ -1193,7 +1195,7 @@ mostra_dados:
 	pushl (%edi)
 	flds (%edi)
 	subl $8, %esp
-	fstl (%esp)
+	fstpl (%esp)
 	pushl $mostrasalario
 	call printf
 	addl $16, %esp
