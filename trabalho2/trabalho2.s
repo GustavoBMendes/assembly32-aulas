@@ -387,7 +387,7 @@ reajuste:
 
 	flds float3
 
-	addl $8, %esp
+	##addl $8, %esp
 
 	jmp inicia_reaj
 
